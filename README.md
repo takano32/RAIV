@@ -24,7 +24,11 @@ RAR/CBR は環境によって、別途 7-Zip、UnRAR、bsdtar のいずれかが
 
 ## 起動
 
-通常は `run_raiv.vbs` を実行します。コマンドウィンドウを表示したい場合は `run_raiv.bat`、または次のコマンドで起動できます。
+通常は `run_raiv.pyw` を実行します。Python の関連付け環境によって `.pyw` のダブルクリック起動ができない場合は、`install_pyw_association.bat` を実行すると、現在のユーザーの `.pyw` 関連付けを `where pyw` で見つかる `pyw.exe` に設定できます。
+
+Windows のバージョンや既定アプリ設定によっては、バッチ実行後に `run_raiv.pyw` をダブルクリックした時、`アプリを選択して .pyw ファイルを開く` 画面が表示されることがあります。その場合は `pyw.exe` を選び、`常に使う` を押してください。以後は `run_raiv.pyw` をダブルクリックするだけで起動できます。
+
+関連付けを変更せずに起動したい場合は `run_raiv.bat`、または次のコマンドで起動できます。`run_raiv.vbs` は互換用に残しています。
 
 ```powershell
 python .\raiv.py
@@ -76,15 +80,14 @@ Real-ESRGAN モデル:
 
 全般:
 
-- Language（日本語 / English）
 - ビューアー先読み枚数
-- CPU リサンプルキャッシュ
-- 表示リサンプル方式: Lanczos3、Lanczos4、Bicubic、Area
 - 背景色
+- 見開き表示による漫画の左右2枚表示
+- 横長画像を既に見開きのページとして扱う1枚表示
 - 比較モード、比較スライダー、境界線色、境界線太さ
 - 表示リセット、ページ送り間隔
 - 現在ページ位置の表示とスライダー移動
-- ページ位置スライダーとサムネイル列の左右入れ替え
+- ページ位置スライダーとサムネイル列の左右入れ替え（右綴じ）
 - 画面下部サムネイルの表示と固定/自動表示
 - 最後/最初でページ送りした時のループ
 - ページ送り時にズーム、表示位置、回転/反転状態を維持
@@ -92,6 +95,21 @@ Real-ESRGAN モデル:
 - 全画面時のマウスカーソル非表示
 - ログ表示
 - 内部プロファイリング表示
+
+画像調整:
+
+- GIMP `.cur` トーンカーブファイルを使った表示補正
+- モノクロ漫画を疑似4色刷り風に表示
+- トーンカーブを画面上で確認しながら調整し、`.cur` として保存
+
+`.cur` ファイルはアプリフォルダ内の `cur` フォルダから読み込みます。
+
+その他:
+
+- Language（日本語 / English）
+- 拡大縮小時の高品質補完
+- 表示リサンプル方式: Lanczos3、Lanczos4、Bicubic、Area
+- アプリの二重起動禁止
 - 次回起動時の古い一時ファイル削除
 
 サムネイル列は下端に表示されます。固定表示では画像表示領域を少し使い、自動表示ではビューアー下端へマウスを近づけた時だけ重ねて表示します。サムネイルの大きさは列の高さ変更に合わせて自動調整されます。
@@ -104,7 +122,7 @@ Real-ESRGAN モデル:
 - 設定中に `Esc` を押すと未割当に戻る
 - `Space` の次ページ送り、`Backspace` の前ページ送りは固定
 
-CPU リサンプルキャッシュをオンにすると、原寸と異なる表示サイズの画像を高品質に作成して保持します。ズーム操作中は速度を優先し、操作が止まってから高品質表示へ切り替わります。オフにすると標準の高速表示になります。
+拡大縮小時の高品質補完をオンにすると、原寸と異なる表示サイズの画像を高品質に作成して保持します。ズーム操作中は速度を優先し、操作が止まってから高品質表示へ切り替わります。オフにすると標準の高速表示になります。
 
 ## 操作
 
@@ -130,6 +148,10 @@ CPU リサンプルキャッシュをオンにすると、原寸と異なる表�
 - 右カーソル: 前ページへ移動（キーコンフィグで変更可能）
 - `F3`: サムネイル列の固定/自動表示を切り替え（キーコンフィグで変更可能）
 - `F4`: 右ペインの固定/自動表示を切り替え（キーコンフィグで変更可能）
+- `W`: 見開き表示を切り替え（キーコンフィグで変更可能）
+- `Q`: 見開き表示中に1ページ送り（キーコンフィグで変更可能）
+- `E`: 見開き表示中に1ページ戻し（キーコンフィグで変更可能）
+- `T`: トーンカーブ補正を切り替え（キーコンフィグで変更可能）
 - `R`: 画像を右回転（キーコンフィグで変更可能）
 - `L`: 画像を左回転（キーコンフィグで変更可能）
 - `H`: 画像を左右反転（キーコンフィグで変更可能）
@@ -152,7 +174,7 @@ CPU リサンプルキャッシュをオンにすると、原寸と異なる表�
 
 設定はアプリと同じフォルダの `setting.json` に保存されます。設定ファイルがない場合は初期設定で起動します。
 
-一時ファイルは OS の一時フォルダに RAIV 用の接頭辞付きで作成され、通常終了時に削除されます。クラッシュなどで残った場合に備えて、全般タブから次回起動時の古い一時ファイル削除を予約できます。
+一時ファイルは OS の一時フォルダに RAIV 用の接頭辞付きで作成され、通常終了時に削除されます。クラッシュなどで残った場合に備えて、その他タブから次回起動時の古い一時ファイル削除を予約できます。
 
 ## アーカイブ対応
 
@@ -197,7 +219,11 @@ Depending on your environment, RAR/CBR support may also require 7-Zip, UnRAR, or
 
 ## Launch
 
-Usually, run `run_raiv.vbs`. If you want to show the command window, run `run_raiv.bat`, or launch it manually:
+Usually, run `run_raiv.pyw`. If double-clicking `.pyw` files does not work because of Python file association settings, run `install_pyw_association.bat` to associate `.pyw` with the `pyw.exe` found by `where pyw` for the current Windows user.
+
+Depending on your Windows version and default app settings, double-clicking `run_raiv.pyw` after running the batch file may still show an `Open .pyw file with` app selection dialog. In that case, choose `pyw.exe` and click `Always`. After that, `run_raiv.pyw` should launch by double-clicking.
+
+If you do not want to change file associations, run `run_raiv.bat`, or launch it manually. `run_raiv.vbs` is kept only for compatibility.
 
 ```powershell
 python .\raiv.py
@@ -249,15 +275,14 @@ Engine settings:
 
 General:
 
-- Language (Japanese / English)
 - Viewer prefetch count
-- CPU resample cache
-- Display resampling method: Lanczos3, Lanczos4, Bicubic, Area
 - Background color
+- Spread view for manga pages
+- Show landscape images as a single page when they are already spread pages
 - Compare mode, compare slider, divider color, divider width
 - Reset view, page navigation interval
 - Current page slider and page count
-- Reverse page slider direction and thumbnail strip direction
+- Reverse page slider direction and thumbnail strip direction for right-to-left reading
 - Bottom thumbnail strip with pinned/auto display modes
 - Wrap around at first/last page
 - Preserve zoom, pan, rotation, and flip state during page navigation
@@ -265,6 +290,21 @@ General:
 - Hide mouse cursor in fullscreen
 - Log display
 - Internal profiling display
+
+Image Adjustment:
+
+- Display adjustment using GIMP `.cur` tone curve files
+- Pseudo four-color printing style for monochrome manga
+- Edit tone curves while viewing the graph and save them as `.cur`
+
+`.cur` files are loaded from the `cur` folder inside the application folder.
+
+Other:
+
+- Language (Japanese / English)
+- High-quality scaling for zoomed/resized display
+- Display resampling method: Lanczos3, Lanczos4, Bicubic, Area
+- Prevent multiple app instances
 - Cleanup old temporary files on next startup
 
 The thumbnail strip appears at the bottom. In pinned mode it uses part of the image area; in auto mode it overlays the viewer only when the mouse approaches the bottom edge. Thumbnail size is adjusted automatically from the strip height.
@@ -277,7 +317,7 @@ Key configuration:
 - Press `Esc` while assigning to clear a binding
 - `Space` for next page and `Backspace` for previous page are fixed
 
-When CPU resample cache is enabled, RAIV creates and keeps high-quality display-size images. During zoom interaction it prioritizes speed, then switches to high-quality rendering after the operation stops. When disabled, RAIV uses the standard fast display path.
+When high-quality scaling is enabled, RAIV creates and keeps high-quality display-size images. During zoom interaction it prioritizes speed, then switches to high-quality rendering after the operation stops. When disabled, RAIV uses the standard fast display path.
 
 ## Controls
 
@@ -303,6 +343,10 @@ Keyboard:
 - Right arrow: previous page, configurable
 - `F3`: toggle thumbnail strip pinned/auto mode, configurable
 - `F4`: toggle right panel pinned/auto mode, configurable
+- `W`: toggle spread view, configurable
+- `Q`: shift one page forward in spread view, configurable
+- `E`: shift one page backward in spread view, configurable
+- `T`: toggle tone curve adjustment, configurable
 - `R`: rotate image right, configurable
 - `L`: rotate image left, configurable
 - `H`: flip image horizontally, configurable
@@ -325,7 +369,7 @@ While viewing archives, scale-folder saving and scale-folder cache loading are d
 
 Settings are saved as `setting.json` in the application folder. If the file does not exist, RAIV starts with default settings.
 
-Temporary files are created under the OS temporary folder with RAIV-specific prefixes and are removed on normal exit. If files remain after a crash, you can reserve cleanup of old temporary files from the General tab for the next startup.
+Temporary files are created under the OS temporary folder with RAIV-specific prefixes and are removed on normal exit. If files remain after a crash, you can reserve cleanup of old temporary files from the Other tab for the next startup.
 
 ## Archive Support
 
